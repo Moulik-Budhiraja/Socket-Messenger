@@ -1,13 +1,5 @@
 import pickle
-from enum import Enum, auto
-
-
-class MessageType(Enum):
-    MESSAGE = auto()
-    DISCONNECT = auto()
-    CONNECT = auto()
-    REQUEST = auto()
-    RESPONSE = auto()
+from message_types import MessageType
 
 
 class Message:

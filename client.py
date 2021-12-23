@@ -1,5 +1,6 @@
 import socket
-from message import Message, MessageType
+from message import Message
+from message_types import RequestType, MessageType
 
 
 class Client:
@@ -12,6 +13,8 @@ class Client:
         self.FORMAT = "utf-8"
 
     def connect(self) -> None:
+        """
+            Establishes a connection to the server"""
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client.connect(self.ADDR)
 
@@ -28,7 +31,7 @@ class Client:
         self.client.send(msg.length)
         self.client.send(msg.encoded)
 
-    def request(self, msg: str) -> str:
+    def request(self, msg: str, msg_type: RequestType) -> Message:
         """
             Sends a request to the server and returns the response"""
         self.send(msg, MessageType.REQUEST)
@@ -39,10 +42,11 @@ class Client:
             msg = Message.decode(msg)
             return msg
         else:
-            return ""
+            return Message(type=MessageType.BLANK)
 
 
-client = Client(socket.gethostbyname(socket.gethostname()))
-client.connect()
-client.send(input("Enter a message: "))
-client.disconnect()
+if __name__ == '__main__':
+    client = Client(socket.gethostbyname(socket.gethostname()))
+    client.connect()
+    client.send(input("Enter a message: "))
+    client.disconnect()

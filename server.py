@@ -1,7 +1,8 @@
 import socket
 import threading
 import pickle
-from message import Message, MessageType
+from message import Message
+from message_types import RequestType, MessageType
 
 
 class Server:
