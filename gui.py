@@ -18,6 +18,8 @@ ORANGE = (255, 165, 0)
 YELLOW = (255, 255, 0)
 GREY = (100, 100, 100)
 
+messages = []
+
 
 class Button:
     FONT = pygame.font.SysFont('Arial', 20)
@@ -81,22 +83,24 @@ class TextBox:
             self.active = False
 
     def update_text(self, event: pygame.event) -> None:
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_BACKSPACE:
-                self.backspace = True
-            if event.key == pygame.K_RETURN:
-                self.backspace = False
-                self.backspace_time = 0
-            else:
-                self.text += event.unicode
+        if self.active:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE:
+                    self.backspace = True
+                elif event.key == pygame.K_RETURN:
+                    self.backspace = False
+                    self.backspace_time = 0
+                else:
+                    self.text += event.unicode
 
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_BACKSPACE:
-                self.backspace = False
-                self.backspace_time = 0
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_BACKSPACE:
+                    self.backspace = False
+                    self.backspace_time = 0
 
     def update_backspace(self) -> None:
         if self.backspace and self.active:
+
             if self.backspace_time == 0:
                 self.text = self.text[:-1]
             elif self.backspace_time > 15 and self.backspace_time % 2 == 0:
@@ -112,7 +116,7 @@ class TextBox:
 
         if self.width + self.x > max_width:
             self.text = self.text[:-1]
-            self.update()
+            self.update(max_width)
 
 
 class Gui:
@@ -124,7 +128,8 @@ class Gui:
         self.font = pygame.font.SysFont('Arial', 20)
 
         # OBJECTS
-
+        self.name_box = TextBox(
+            self.screen, '', 600, 50, 100, 50, BLUE)
         self.text_box = TextBox(self.screen, '', 100, 500, 200, 50, BLUE)
         self.send_button = Button(
             self.screen, 'Send', 300, 500, 100, 50, GREEN)
@@ -132,6 +137,7 @@ class Gui:
     def render(self) -> None:
         self.screen.fill((128, 128, 128))
 
+        self.name_box.draw()
         self.text_box.draw()
         self.send_button.draw()
 
@@ -146,7 +152,7 @@ def main() -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                client.disconnect()
+                client.disconnect(author=gui.name_box.text)
                 return
 
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -155,18 +161,28 @@ def main() -> None:
                 else:
                     gui.text_box.set_focus(False)
 
+                if gui.name_box.is_clicked(event.pos):
+                    gui.name_box.set_focus(True)
+                else:
+                    gui.name_box.set_focus(False)
+
                 if gui.send_button.is_clicked(event.pos):
-                    client.send(gui.text_box.text)
+                    client.send(author=gui.name_box.text,
+                                msg=gui.text_box.text)
                     gui.text_box.text = ''
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     if gui.text_box.active:
-                        client.send(gui.text_box.text)
+                        client.send(author=gui.name_box.text,
+                                    msg=gui.text_box.text)
                         gui.text_box.text = ''
 
+            gui.name_box.update_text(event)
             gui.text_box.update_text(event)
 
+        gui.name_box.update_backspace()
+        gui.name_box.update(max_width=700)
         gui.text_box.update_backspace()
         gui.text_box.update(max_width=600)
 

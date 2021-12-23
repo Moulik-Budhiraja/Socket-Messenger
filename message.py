@@ -3,7 +3,8 @@ from message_types import MessageType
 
 
 class Message:
-    def __init__(self, content='', type=MessageType.MESSAGE, header_length=64, header_format='utf-8') -> None:
+    def __init__(self, author, content='', type=MessageType.MESSAGE, header_length=64, header_format='utf-8') -> None:
+        self.author = author
         self.content = content
         self.type = type
         self.HEADER_LENGTH = header_length

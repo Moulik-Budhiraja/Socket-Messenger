@@ -18,15 +18,15 @@ class Client:
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client.connect(self.ADDR)
 
-    def disconnect(self) -> None:
+    def disconnect(self, author) -> None:
         """
             Sends a message to the server to disconnect"""
-        self.send(type=MessageType.DISCONNECT)
+        self.send(author, type=MessageType.DISCONNECT)
 
-    def send(self, msg: str = '', type=MessageType.MESSAGE) -> None:
+    def send(self, author, msg: str = '', type=MessageType.MESSAGE) -> None:
         """
             Sends a message to the server"""
-        msg = Message(msg, type)
+        msg = Message(author, msg, type)
         msg.encode()
         self.client.send(msg.length)
         self.client.send(msg.encoded)

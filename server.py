@@ -5,6 +5,15 @@ from message import Message
 from message_types import RequestType, MessageType
 
 
+class Data:
+    def __init__(self):
+        self.data = []
+        self.data_user = {}
+
+    def add_data(self, data: Message):
+        pass
+
+
 class Server:
     def __init__(self, ip=socket.gethostbyname(socket.gethostname()), port=5050) -> None:
         self.IP = ip
@@ -45,11 +54,11 @@ class Server:
                 msg = Message.decode(msg)
                 if msg.type == MessageType.DISCONNECT:
                     connected = False
-                    print(f"[DISCONNECT] {addr} disconnected.")
+                    print(f"[DISCONNECT] {msg.author} disconnected.")
                 elif msg.type == MessageType.REQUEST:
                     self.handle_request(msg, conn, addr)
                 else:
-                    print(f"[{addr}] {msg.content}")
+                    print(f"[{msg.author}] {msg.content}")
 
     def handle_request(self, msg, conn, addr):
         """
